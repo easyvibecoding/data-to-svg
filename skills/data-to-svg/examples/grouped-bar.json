@@ -1,0 +1,20 @@
+{
+  "type": "grouped_bar",
+  "title": "Throughput at 4K context",
+  "subtitle": "Same machine, checkpoint, and context length",
+  "categories": ["Prefill", "Decode"],
+  "series": [
+    {
+      "name": "Engine A",
+      "values": [5749.9, 186.6]
+    },
+    {
+      "name": "Engine B",
+      "values": [4737.5, 140.9]
+    }
+  ],
+  "unit": "tok/s",
+  "source": "Example data only",
+  "notes": "No normalization or aggregation applied.",
+  "show_values": true
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Data to SVG"
+  short_description: "Turn provided data into local SVG charts."
+  default_prompt: "Use $data-to-svg to create a clear local SVG chart from my supplied data without inventing values or uploading anything."
