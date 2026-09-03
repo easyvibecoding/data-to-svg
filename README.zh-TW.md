@@ -13,9 +13,15 @@
 
 - 單系列長條圖
 - 群組長條圖
-- 多系列折線圖
+- 適合排行與長標籤的水平長條圖
+- 可明確保留缺值斷點的多系列折線圖
+- 可分組的 x/y 散點圖
+- 中心值／下界／上界區間圖
+- 可顯示 `N/A` 的同單位數值熱圖
 
-Renderer 會驗證類別和值是否對齊、數字是否有限、系列名稱是否唯一、座標範圍是否包含所有資料、文字是否安全 escape，以及長條圖是否保留零基線。第一版刻意不支援容易誤導的雙 y 軸，也不會默默計算百分比、平均或排名。
+Renderer 會驗證類別和值是否對齊、數字是否有限、系列名稱是否唯一、區間順序、座標範圍、文字是否安全 escape，以及長條圖是否保留零基線。它刻意不支援容易誤導的雙 y 軸，也不會默默計算趨勢、信賴區間、百分比、平均或排名。
+
+這批能力來自對 EasyVibeCoding 已發布策展的唯讀稽核：263 篇策展、637 個圖表媒體。各種資料形狀的實際數量與取捨見[策展資料形狀研究](CORPUS_STUDY.md)。
 
 ## 安裝
 
@@ -56,6 +62,8 @@ python3 skills/data-to-svg/scripts/render_chart.py \
 ```
 
 所有欄位與正確性規則見[資料規格](skills/data-to-svg/references/spec.md)。
+
+另有[散點圖](skills/data-to-svg/examples/scatter.json)、[區間圖](skills/data-to-svg/examples/interval.json)、[熱圖](skills/data-to-svg/examples/heatmap.json)、[水平長條圖](skills/data-to-svg/examples/horizontal-bar.json)與[含缺值折線圖](skills/data-to-svg/examples/line-missing.json)範例。
 
 ## 驗證
 

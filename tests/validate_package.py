@@ -16,7 +16,13 @@ REQUIRED = [
     SKILL / "scripts" / "render_chart.py",
     SKILL / "references" / "spec.md",
     SKILL / "examples" / "grouped-bar.json",
+    SKILL / "examples" / "heatmap.json",
+    SKILL / "examples" / "horizontal-bar.json",
+    SKILL / "examples" / "interval.json",
     SKILL / "examples" / "line.json",
+    SKILL / "examples" / "line-missing.json",
+    SKILL / "examples" / "scatter.json",
+    ROOT / "CORPUS_STUDY.md",
 ]
 
 
@@ -35,20 +41,21 @@ def main() -> int:
         return 1
 
     with tempfile.TemporaryDirectory() as tmp:
-        output = Path(tmp) / "example.svg"
-        result = subprocess.run(
-            [
-                sys.executable,
-                str(SKILL / "scripts" / "render_chart.py"),
-                str(SKILL / "examples" / "grouped-bar.json"),
-                "--output",
-                str(output),
-            ],
-            check=False,
-        )
-        if result.returncode != 0 or not output.is_file():
-            print("Example rendering failed", file=sys.stderr)
-            return 1
+        for example in sorted((SKILL / "examples").glob("*.json")):
+            output = Path(tmp) / f"{example.stem}.svg"
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(SKILL / "scripts" / "render_chart.py"),
+                    str(example),
+                    "--output",
+                    str(output),
+                ],
+                check=False,
+            )
+            if result.returncode != 0 or not output.is_file():
+                print(f"Example rendering failed: {example.name}", file=sys.stderr)
+                return 1
     print("Package validation passed")
     return 0
 

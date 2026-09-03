@@ -1,0 +1,13 @@
+{
+  "type": "heatmap",
+  "title": "Benchmark score matrix",
+  "categories": ["Code", "Reasoning", "Agent", "Long context"],
+  "series": [
+    {"name": "Model A", "values": [72.1, 81.4, 63.2, 77.8]},
+    {"name": "Model B", "values": [75.8, 79.6, null, 82.3]},
+    {"name": "Model C", "values": [69.4, 84.2, 71.5, 80.1]}
+  ],
+  "unit": "%",
+  "source": "Example data only",
+  "notes": "The missing benchmark is rendered as N/A, never zero."
+}

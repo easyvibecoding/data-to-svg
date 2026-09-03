@@ -1,0 +1,14 @@
+{
+  "type": "interval",
+  "title": "Accuracy with reported confidence intervals",
+  "points": [
+    {"label": "Model A", "value": 57.1, "low": 54.8, "high": 59.4},
+    {"label": "Model B", "value": 61.5, "low": 59.1, "high": 63.9},
+    {"label": "Model C", "value": 65.8, "low": 63.6, "high": 68.0},
+    {"label": "Model D", "value": 68.4, "low": 66.0, "high": 70.8}
+  ],
+  "unit": "%",
+  "x_label": "Accuracy",
+  "source": "Example data only",
+  "notes": "Bounds are supplied values, not intervals calculated by the renderer."
+}

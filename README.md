@@ -13,9 +13,15 @@ It is deliberately narrow:
 
 - Single-series bar charts
 - Grouped bar charts
-- Multi-series line charts
+- Horizontal ranking bars
+- Multi-series line charts with explicit missing-value gaps
+- Grouped x/y scatter plots
+- Center/low/high interval plots
+- Same-unit numeric heatmaps with explicit `N/A` cells
 
-The renderer validates category/value alignment, finite numbers, unique series names, explicit axis bounds, safe XML text, and truthful zero baselines for bars. It intentionally omits dual axes and implicit calculations.
+The renderer validates category/value alignment, finite numbers, unique series names, interval ordering, explicit axis bounds, safe XML text, and truthful zero baselines for bars. It intentionally omits dual axes, inferred trends, calculated confidence intervals, and other implicit transformations.
+
+These additions were selected from a read-only audit of 637 chart media items across 263 published EasyVibeCoding curations. See [the corpus shape study](CORPUS_STUDY.md) for the evidence and scope decisions.
 
 ## Install
 
@@ -56,6 +62,8 @@ python3 skills/data-to-svg/scripts/render_chart.py \
 ```
 
 See [the specification](skills/data-to-svg/references/spec.md) for all fields and accuracy rules.
+
+Additional examples cover [scatter](skills/data-to-svg/examples/scatter.json), [interval](skills/data-to-svg/examples/interval.json), [heatmap](skills/data-to-svg/examples/heatmap.json), [horizontal bar](skills/data-to-svg/examples/horizontal-bar.json), and a [line with a missing observation](skills/data-to-svg/examples/line-missing.json).
 
 ## Validate
 

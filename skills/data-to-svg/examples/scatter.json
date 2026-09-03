@@ -1,0 +1,15 @@
+{
+  "type": "scatter",
+  "title": "Task cost versus accuracy",
+  "points": [
+    {"label": "Model A", "group": "Open", "x": 0.27, "y": 58.5},
+    {"label": "Model B", "group": "Open", "x": 0.48, "y": 63.1},
+    {"label": "Model C", "group": "Hosted", "x": 0.82, "y": 67.4},
+    {"label": "Model D", "group": "Hosted", "x": 1.16, "y": 70.2}
+  ],
+  "x_label": "Cost per task",
+  "y_label": "Accuracy",
+  "x_prefix": "$",
+  "y_unit": "%",
+  "source": "Example data only"
+}

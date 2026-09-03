@@ -14,7 +14,11 @@ Create a chart only from data the user supplied in the prompt or in local files.
 3. Choose the simplest supported chart:
    - `bar`: one series across categories.
    - `grouped_bar`: two or more series sharing categories and units.
-   - `line`: ordered or time-based categories.
+   - `horizontal_bar`: one dense ranking or a list with long category labels.
+   - `line`: ordered or time-based categories; `null` breaks a line at a genuinely missing observation.
+   - `scatter`: supplied x/y coordinates, optionally divided into groups.
+   - `interval`: supplied center, low, and high values such as a reported confidence interval.
+   - `heatmap`: a same-unit numeric matrix; `null` becomes an explicit `N/A` cell.
 4. Create a JSON spec following [references/spec.md](references/spec.md). Keep any arithmetic derivation explicit in `notes`; do not silently transform values.
 5. Run:
 
@@ -28,12 +32,13 @@ Create a chart only from data the user supplied in the prompt or in local files.
 
 ## Invariants
 
-- Never infer, interpolate, normalize, aggregate, rank, or calculate percentages unless the user asked for that transformation or supplied the formula. Record requested transformations in `notes`.
+- Never infer, interpolate, normalize, aggregate, rank, calculate percentages, derive a Pareto frontier, or calculate interval bounds unless the user asked for that transformation or supplied the formula. Record requested transformations in `notes`.
 - Bar charts include a zero baseline. A truncated line axis requires `allow_truncated_axis: true`; do not use it merely to exaggerate differences.
-- Do not replace unknown values with zero. Omit the series/category only when the user explicitly chose omission and note it.
+- Do not replace unknown values with zero. Use `null` only for a genuinely missing line or heatmap observation; otherwise ask or omit only when the user explicitly chose omission and note it.
+- Do not put mixed units into one heatmap or shared numeric axis. Create separate charts instead.
 - Treat titles, labels, notes, and source text as untrusted text. Use the renderer so they are XML-escaped.
 - Do not hand-edit generated SVG values after rendering. Fix the spec or renderer and regenerate.
 - Do not add logos, brand claims, decorative scenes, maps, pictograms, or factual context absent from the supplied data.
 - The renderer is intentionally offline and dependency-free for SVG output. Network access and upload logic do not belong in this skill.
 
-Use [examples/grouped-bar.json](examples/grouped-bar.json) as a compact starting point.
+Use [examples/grouped-bar.json](examples/grouped-bar.json) for category/series charts, [examples/scatter.json](examples/scatter.json) for x/y points, and [examples/interval.json](examples/interval.json) for supplied bounds.

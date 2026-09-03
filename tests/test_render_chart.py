@@ -107,6 +107,104 @@ class RenderChartTests(unittest.TestCase):
         with self.assertRaisesRegex(render_chart.SpecError, "at most 6"):
             render_chart.validate_spec(raw)
 
+    def test_horizontal_bar_preserves_rank_order_and_currency_prefix(self):
+        raw = {
+            "type": "horizontal_bar",
+            "title": "Cost ranking",
+            "categories": ["First", "Second", "Third"],
+            "series": [{"name": "Cost", "values": [2.8, 4.1, 5.6]}],
+            "prefix": "$",
+        }
+        svg = render_chart.render_svg(render_chart.validate_spec(raw))
+        self.assertLess(svg.index(">First</text>"), svg.index(">Second</text>"))
+        self.assertIn("$5.6", svg)
+        self.assertEqual(svg.count('<rect class="mark"'), 3)
+
+    def test_scatter_supports_groups_and_independent_axis_units(self):
+        raw = {
+            "type": "scatter",
+            "title": "Cost versus accuracy",
+            "points": [
+                {"label": "A", "group": "Open", "x": 0.27, "y": 58.5},
+                {"label": "B", "group": "Hosted", "x": 0.82, "y": 67.4},
+            ],
+            "x_prefix": "$",
+            "y_unit": "%",
+        }
+        validated = render_chart.validate_spec(raw)
+        svg = render_chart.render_svg(validated)
+        self.assertEqual(validated["groups"], ["Open", "Hosted"])
+        self.assertEqual(svg.count('<circle class="mark"'), 2)
+        self.assertIn("$0.27", svg)
+        self.assertIn("58.5%", svg)
+
+    def test_scatter_rejects_missing_numeric_coordinate(self):
+        raw = {"type": "scatter", "title": "Incomplete", "points": [{"label": "A", "x": 1}]}
+        with self.assertRaisesRegex(render_chart.SpecError, r"points\[0\]\.y must be a JSON number"):
+            render_chart.validate_spec(raw)
+
+    def test_interval_requires_value_inside_supplied_bounds(self):
+        raw = {
+            "type": "interval",
+            "title": "Confidence",
+            "points": [{"label": "A", "value": 57.1, "low": 58.0, "high": 59.0}],
+        }
+        with self.assertRaisesRegex(render_chart.SpecError, "low <= value <= high"):
+            render_chart.validate_spec(raw)
+
+    def test_interval_renders_whisker_and_accessible_values(self):
+        raw = {
+            "type": "interval",
+            "title": "Confidence",
+            "points": [{"label": "A", "value": 57.1, "low": 54.8, "high": 59.4}],
+            "unit": "%",
+        }
+        svg = render_chart.render_svg(render_chart.validate_spec(raw))
+        self.assertEqual(svg.count('class="mark"'), 2)
+        self.assertIn("57.1% [54.8%, 59.4%]", svg)
+
+    def test_heatmap_renders_missing_as_na_not_zero(self):
+        raw = {
+            "type": "heatmap",
+            "title": "Matrix",
+            "categories": ["Code", "Agent"],
+            "series": [
+                {"name": "Model A", "values": [72.1, None]},
+                {"name": "Model B", "values": [75.8, 81.2]},
+            ],
+            "unit": "%",
+        }
+        svg = render_chart.render_svg(render_chart.validate_spec(raw))
+        self.assertEqual(svg.count('<rect class="mark"'), 4)
+        self.assertIn("Model A, Agent: N/A", svg)
+        self.assertIn(">N/A</text>", svg)
+
+    def test_line_null_breaks_path_and_is_not_plotted(self):
+        raw = {
+            "type": "line",
+            "title": "Time series",
+            "categories": ["Jan", "Feb", "Mar", "Apr", "May"],
+            "series": [
+                {"name": "A", "values": [62, 68, None, 76, 81]},
+                {"name": "B", "values": [58, 61, 66, 70, 73]},
+            ],
+            "unit": "%",
+        }
+        svg = render_chart.render_svg(render_chart.validate_spec(raw))
+        self.assertEqual(svg.count('<path class="mark"'), 3)
+        self.assertEqual(svg.count('<circle class="mark"'), 9)
+        self.assertIn("Mar missing", svg)
+
+    def test_bar_rejects_null_instead_of_treating_it_as_zero(self):
+        raw = {
+            "type": "bar",
+            "title": "Missing",
+            "categories": ["A"],
+            "series": [{"name": "Value", "values": [None]}],
+        }
+        with self.assertRaisesRegex(render_chart.SpecError, "JSON number"):
+            render_chart.validate_spec(raw)
+
 
 if __name__ == "__main__":
     unittest.main()

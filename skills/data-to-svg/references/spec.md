@@ -1,8 +1,10 @@
 # Chart specification
 
-The renderer accepts one UTF-8 JSON object.
+The renderer accepts one UTF-8 JSON object. Every chart requires a supported `type` and non-empty `title`.
 
-## Required fields
+## Category and matrix charts
+
+`bar`, `grouped_bar`, `horizontal_bar`, `line`, and `heatmap` use ordered categories and series:
 
 ```json
 {
@@ -16,38 +18,82 @@ The renderer accepts one UTF-8 JSON object.
 }
 ```
 
-- `type`: `bar`, `grouped_bar`, or `line`.
-- `title`: non-empty chart title.
-- `categories`: ordered, non-empty string labels.
-- `series`: non-empty list of unique names and finite numeric values. Every series must have exactly one value per category.
+- `bar` and `horizontal_bar` require exactly one series.
+- `grouped_bar` requires at least two series.
+- `line` accepts one or more series. A JSON `null` is allowed and creates a visible break; it is never plotted as zero.
+- `heatmap` uses series as rows and categories as columns. A JSON `null` is rendered as `N/A`.
+- Non-heatmap charts accept at most 24 categories and 6 series. Heatmaps accept up to 16 rows by 16 columns.
 
-`bar` accepts exactly one series. `grouped_bar` requires at least two. `line` accepts one or more.
-For readable output, one chart accepts at most 24 categories and 6 series; split denser data into multiple charts.
+## Scatter charts
 
-## Optional fields
+`scatter` uses exact x/y points. Labels are optional; `group` defaults to `Data`.
+
+```json
+{
+  "type": "scatter",
+  "title": "Task cost versus accuracy",
+  "points": [
+    {"label": "Model A", "group": "Open", "x": 0.27, "y": 58.5},
+    {"label": "Model B", "group": "Hosted", "x": 0.82, "y": 67.4}
+  ],
+  "x_prefix": "$",
+  "y_unit": "%"
+}
+```
+
+Scatter charts accept at most 60 points and 6 groups. The renderer does not calculate a regression, trend, ranking, correlation, or Pareto frontier.
+
+## Interval charts
+
+`interval` uses supplied center and bound values. Each label must be unique and satisfy `low <= value <= high`.
+
+```json
+{
+  "type": "interval",
+  "title": "Accuracy with reported confidence intervals",
+  "points": [
+    {"label": "Model A", "value": 57.1, "low": 54.8, "high": 59.4},
+    {"label": "Model B", "value": 61.5, "low": 59.1, "high": 63.9}
+  ],
+  "unit": "%"
+}
+```
+
+Interval charts accept at most 24 points. Bounds must already exist in the input; the renderer never derives them from an error value, sample size, or distribution.
+
+## Shared optional fields
 
 | Field | Type | Meaning |
 | --- | --- | --- |
 | `subtitle` | string | Context that materially affects interpretation. |
-| `x_label` | string | Horizontal-axis label. |
-| `y_label` | string | Vertical-axis label. |
-| `unit` | string | Suffix on tick and value labels, such as `%` or `ms`; spacing is handled automatically. |
+| `x_label` / `y_label` | string | Axis labels. |
+| `unit` | string | Suffix for categorical, heatmap, or interval values, such as `%` or `ms`. |
+| `prefix` | string | Prefix for categorical, heatmap, or interval values, such as `$`. |
 | `source` | string | User-supplied source note rendered in the footer. |
-| `notes` | string | Derivation or caveat rendered in the footer. |
-| `show_values` | boolean | Show numeric labels on marks; default `true` for bars and `false` for lines. |
-| `y_min` / `y_max` | number | Explicit axis limits. They must contain all values. |
-| `allow_truncated_axis` | boolean | Required when a line chart excludes zero from its y-axis. |
+| `notes` | string | User-requested derivation or caveat rendered in the footer. |
+| `show_values` | boolean | Show values on marks. Defaults to true except for line and scatter charts. |
+| `show_labels` | boolean | Show scatter point labels. Defaults to true for at most 20 points. |
 | `width` | integer | SVG width from 640 to 2400; default 1200. |
 | `height` | integer | SVG height from 400 to 1600; default 750. |
-| `colors` | array | One hex color per series, or fewer to cycle. |
+| `colors` | array | Six-digit hex colors in series/group order, or fewer to cycle. |
+
+## Axis fields
+
+- Category and line charts accept `y_min` / `y_max`.
+- Scatter charts accept `x_min` / `x_max` and `y_min` / `y_max`, plus `x_prefix`, `x_unit`, `y_prefix`, and `y_unit`.
+- Interval charts accept `x_min` / `x_max`.
+- Heatmaps accept `value_min` / `value_max` for their color range.
+- Explicit bounds must contain every plotted value.
+- Bar lengths always include zero. Line charts default to a zero-based y-axis; excluding zero requires `allow_truncated_axis: true`.
+- Scatter and interval positions default to a padded data range because their marks do not encode magnitude by bar length.
 
 ## Accuracy rules
 
 - JSON numbers must be finite. `NaN`, `Infinity`, numeric strings, and booleans are rejected.
-- The renderer preserves series/category order.
-- It does not calculate percentages, averages, rankings, confidence intervals, or missing values.
-- If a requested calculation is legitimate, perform it before rendering and describe it in `notes`.
-- Mixed units belong in separate charts unless the user explicitly requests and understands a dual-axis chart. Dual axes are intentionally unsupported.
+- The renderer preserves point, series, category, and group order.
+- It does not calculate percentages, averages, rankings, confidence intervals, missing values, or statistical relationships.
+- Mixed units belong in separate charts. Dual axes are intentionally unsupported.
+- Generated SVG includes a `<title>` and a data-bearing `<desc>` for assistive technology.
 
 ## Local PNG
 

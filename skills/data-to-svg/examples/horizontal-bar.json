@@ -1,0 +1,9 @@
+{
+  "type": "horizontal_bar",
+  "title": "Cost per 1,000 queries",
+  "categories": ["Provider A", "Provider B", "Provider C", "Provider D", "Provider E"],
+  "series": [{"name": "Estimated cost", "values": [2.8, 4.1, 5.6, 8.3, 11.2]}],
+  "prefix": "$",
+  "source": "Example data only",
+  "notes": "Categories preserve the supplied ranking order."
+}
